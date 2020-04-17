@@ -1,7 +1,14 @@
 package it.polito.tdp.lab04;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.lab04.model.Corso;
+import it.polito.tdp.lab04.model.Model;
+import it.polito.tdp.lab04.model.Studente;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -12,6 +19,9 @@ import javafx.scene.control.TextField;
 
 public class FXMLController {
 
+	Model model;
+	
+	
     @FXML
     private ResourceBundle resources;
 
@@ -55,7 +65,32 @@ public class FXMLController {
 
     @FXML
     void doReset(ActionEvent event) {
+    	txtRisultato.clear();
+    	txtNome.clear();
+    	txtCognome.clear();
+    	txtMatricola.clear();
+    	checkMatricola.setSelected(false);
 
+    }
+    
+    @FXML
+    void doStudente(ActionEvent event) {
+    		txtRisultato.clear();
+    	
+    	if(txtMatricola.getText().isEmpty()) {
+    		txtRisultato.appendText("Scrivi una matricola figlio di puttana");
+    		return;
+    	}
+    	
+    		
+    	try {
+    	int matricola= Integer.parseInt(txtMatricola.getText());
+    	Studente s= model.richiamaStudente(matricola);
+    	txtNome.setText(s.getNome());
+    	txtCognome.setText(s.getCognome());
+    	}catch(NumberFormatException e) {
+    		txtRisultato.appendText("Inserisci un numero intero valido, grandissimo figlio di mignotta");
+    	}
     }
 
     @FXML
@@ -65,7 +100,16 @@ public class FXMLController {
 
     @FXML
     void searchIscritti(ActionEvent event) {
-
+    	
+    	String s= menuCorsi.getValue();
+    	if(s=="") {
+    		txtRisultato.appendText("Scegli un corso lurido bastardo");
+    	}
+    	Corso c =new Corso(null,0,s,0);
+    	List<Studente> listaStud=new LinkedList<Studente>(model.RichiamoDellaLista(c));
+    	txtRisultato.appendText(listaStud.toString());
+    	
+    	
     }
 
     @FXML
@@ -81,5 +125,17 @@ public class FXMLController {
         assert txtRisultato != null : "fx:id=\"txtRisultato\" was not injected: check your FXML file 'Scene.fxml'.";
         assert btnReset != null : "fx:id=\"btnReset\" was not injected: check your FXML file 'Scene.fxml'.";
 
+    }
+    
+    public void setModel(Model model) {
+    	this.model=model;
+    	
+    	menuCorsi.getItems().addAll(model.tornaNomiCorsi());
+    	txtNome.setDisable(true);
+    	txtCognome.setDisable(true);
+    	txtRisultato.setDisable(true);
+    	
+    	
+    	
     }
 }

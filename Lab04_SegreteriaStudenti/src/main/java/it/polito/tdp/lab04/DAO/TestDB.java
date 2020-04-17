@@ -4,14 +4,13 @@ public class TestDB {
 
 	public static void main(String[] args) {
 
-		/*
-		 * 	This is a main to check the DB connection
-		 */
-		
-		CorsoDAO cdao = new CorsoDAO();
-		cdao.getTuttiICorsi();
-		
-		
+		/*CorsoDAO cdao = new CorsoDAO();
+		System.out.println(cdao.getTuttiICorsi());
+		System.out.println("----------");
+		StudenteDAO sdao = new StudenteDAO();
+		System.out.println(sdao.getTuttiStudenti());*/
+		StudenteDAO sdao = new StudenteDAO();
+		System.out.println(sdao.getStudenteByMatricola(177600));
 	}
 
 }

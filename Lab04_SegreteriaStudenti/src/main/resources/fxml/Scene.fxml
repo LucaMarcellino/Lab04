@@ -57,7 +57,7 @@
                         <Insets left="10.0" />
                      </HBox.margin>
                   </TextField>
-                  <CheckBox fx:id="checkMatricola" mnemonicParsing="false">
+                  <CheckBox fx:id="checkMatricola" mnemonicParsing="false" onAction="#doStudente">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
