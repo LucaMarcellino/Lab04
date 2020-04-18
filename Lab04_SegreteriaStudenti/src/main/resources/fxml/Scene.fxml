@@ -33,7 +33,7 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <ComboBox fx:id="menuCorsi" prefWidth="150.0">
+                  <ComboBox fx:id="menuCorsi" prefWidth="150.0" promptText="corsi">
                      <HBox.margin>
                         <Insets top="10.0" />
                      </HBox.margin>

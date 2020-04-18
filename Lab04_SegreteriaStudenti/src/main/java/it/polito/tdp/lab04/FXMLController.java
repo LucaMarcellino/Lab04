@@ -1,6 +1,7 @@
 package it.polito.tdp.lab04;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +21,7 @@ import javafx.scene.control.TextField;
 public class FXMLController {
 
 	Model model;
-	
+	List<Corso> corsi;
 	
     @FXML
     private ResourceBundle resources;
@@ -29,7 +30,7 @@ public class FXMLController {
     private URL location;
 
     @FXML
-    private ComboBox<String> menuCorsi;
+    private ComboBox<Corso> menuCorsi;
 
     @FXML
     private Button btnIscritti;
@@ -60,6 +61,18 @@ public class FXMLController {
 
     @FXML
     void doIscrizione(ActionEvent event) {
+    	txtRisultato.clear();
+    	boolean iscritto=false;
+    	Corso c= menuCorsi.getValue();
+    	int matricola= Integer.parseInt(txtMatricola.getText());
+    	Studente s= new Studente(matricola,null,null,null);
+    	iscritto = model.richiamodellAggiunta(s, c);
+    	if(iscritto==true) {
+    		txtRisultato.appendText("Sei riuscito ad iscriverti testa di cazzo,oppure un errore nel database");
+    	}else
+    		txtRisultato.appendText("C'è Stato un errore deficente, potresti anche essere già iscritto");
+    	
+    	
 
     }
 
@@ -86,28 +99,74 @@ public class FXMLController {
     	try {
     	int matricola= Integer.parseInt(txtMatricola.getText());
     	Studente s= model.richiamaStudente(matricola);
+    	if(s.getMatricola()==-1) {
+    		txtRisultato.appendText("Sei un grande figlio di puttana perche non sei iscritto");
+    		return;
+    	}
     	txtNome.setText(s.getNome());
     	txtCognome.setText(s.getCognome());
     	}catch(NumberFormatException e) {
     		txtRisultato.appendText("Inserisci un numero intero valido, grandissimo figlio di mignotta");
     	}
+    	catch(NullPointerException npe) {
+    		txtRisultato.appendText("Non sei iscritto figlio di puttana");
+    	}
     }
 
     @FXML
     void searchCorsi(ActionEvent event) {
+    	txtRisultato.clear();
+    	int matricola=0;
+		try {
+			matricola= Integer.parseInt(txtMatricola.getText());
+		}catch(NumberFormatException nfe) {
+			txtRisultato.appendText("inserisci una matricola, oppure una corretta");
+		}
+		
+		if (menuCorsi.getValue() == null) {
+			txtRisultato.setText("Selezionare un corso.");
+			return;
+		}
+		
+    	if(menuCorsi.getValue().getNome()=="") {
+    		
+    	List<Corso> listaCorsi= new LinkedList<Corso>(model.richiamoCorsoDaMatricola(matricola));
+    	for(int i=0;i<listaCorsi.size();i++) {
+    		if(listaCorsi.get(i).getPd()==-1) {
+    			return;
+    		}
+    		txtRisultato.appendText(listaCorsi.get(i).getCodins()+"\t"+listaCorsi.get(i).getCrediti()+"\t"+listaCorsi.get(i).getNome()+"\t"+listaCorsi.get(1).getPd()+"\n");
+    	}
+    }else {
+    	boolean trovato;
+    	String corso=menuCorsi.getValue().getNome();
+    	trovato=model.richiamoIscritto(matricola, corso);
+    	if(trovato==true) {
+    		txtRisultato.appendText("Bravo coglione sei iscritto");
+    	}
+    	else
+    		txtRisultato.appendText("Non sei iscritto,coglione");
+    	
+    }
+    
 
+    	
+    	
+    	
     }
 
     @FXML
     void searchIscritti(ActionEvent event) {
     	
-    	String s= menuCorsi.getValue();
+    	String s= menuCorsi.getValue().getNome();
     	if(s=="") {
     		txtRisultato.appendText("Scegli un corso lurido bastardo");
     	}
     	Corso c =new Corso(null,0,s,0);
-    	List<Studente> listaStud=new LinkedList<Studente>(model.RichiamoDellaLista(c));
-    	txtRisultato.appendText(listaStud.toString());
+    	List<Studente> listaStud=new LinkedList<Studente>(model.richiamoDellaLista(c));
+    	for(int i=0;i<listaStud.size();i++) {
+    		txtRisultato.appendText(listaStud.get(i).toString());
+    	}
     	
     	
     }
@@ -129,11 +188,14 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model=model;
+    	corsi=model.tornaNomiCorsi();
     	
-    	menuCorsi.getItems().addAll(model.tornaNomiCorsi());
+    	menuCorsi.getItems().addAll(corsi);
+    	
+    	
     	txtNome.setDisable(true);
     	txtCognome.setDisable(true);
-    	txtRisultato.setDisable(true);
+    	txtRisultato.setEditable(false);
     	
     	
     	

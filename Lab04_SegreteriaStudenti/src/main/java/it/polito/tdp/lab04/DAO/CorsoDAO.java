@@ -2,24 +2,23 @@ package it.polito.tdp.lab04.DAO;
 
 import java.sql.Connection;
 
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import it.polito.tdp.lab04.model.Corso;
 import it.polito.tdp.lab04.model.Studente;
 
 public class CorsoDAO {
 	
-	/*
-	 * Ottengo tutti i corsi salvati nel Db
-	 */
+	Map<String,Corso> mappaCorsi=new LinkedHashMap<String,Corso>();
 	public List<Corso> getTuttiICorsi() {
 
 		final String sql = "SELECT * FROM corso";
-
+		
 		List<Corso> corsi = new LinkedList<Corso>();
 
 		try {
@@ -39,6 +38,7 @@ public class CorsoDAO {
 				// Aggiungi il nuovo oggetto Corso alla lista corsi
 				Corso c= new Corso (codins, numeroCrediti,nome,periodoDidattico);
 				corsi.add(c);
+				mappaCorsi.put(codins, c);
 			}
 
 			conn.close();
@@ -56,8 +56,12 @@ public class CorsoDAO {
 	/*
 	 * Dato un codice insegnamento, ottengo il corso
 	 */
-	public void getCorso(Corso corso) {
-		// TODO
+	public Corso getCorso(Corso corso) {
+		Corso c= null;
+		if(mappaCorsi.containsKey(corso.getCodins())) {
+			c= mappaCorsi.get(corso.getCodins());
+		}
+		return c;
 	}
 
 	/*
@@ -96,9 +100,37 @@ public class CorsoDAO {
 	 * Data una matricola ed il codice insegnamento, iscrivi lo studente al corso.
 	 */
 	public boolean inscriviStudenteACorso(Studente studente, Corso corso) {
-		// TODO
-		// ritorna true se l'iscrizione e' avvenuta con successo
-		return false;
+		String sql="INSERT INTO iscrizione VALUES (?,?)";
+		boolean fatto=false;
+		StudenteDAO sdao=new StudenteDAO();
+
+		
+		if(corso.getNome()=="" || sdao.getStudenteByMatricola(studente.getMatricola())==null) {
+			return fatto;
+		}
+		
+
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, studente.getMatricola());
+			st.setString(2,corso.getCodins());
+			ResultSet rs = st.executeQuery();
+			fatto=true;
+			
+			conn.close();
+			return fatto;
+			}catch (SQLException e) {
+				return fatto;
+				
+			}
+		
+	
 	}
+	
+
+	
+	
 
 }
